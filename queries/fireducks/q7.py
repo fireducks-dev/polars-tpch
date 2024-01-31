@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from queries.modin import utils
+from queries.fireducks import utils
 
 Q_NUM = 7
 
