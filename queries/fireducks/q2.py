@@ -1,4 +1,4 @@
-from queries.modin import utils
+from queries.fireducks import utils
 
 Q_NUM = 2
 

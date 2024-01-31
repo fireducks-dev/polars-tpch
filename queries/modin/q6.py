@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from datetime import date
+from datetime import datetime
 
 import modin.pandas as pd
 
@@ -9,31 +7,31 @@ from queries.modin import utils
 Q_NUM = 6
 
 
-def q() -> None:
-    line_item_ds = utils.get_line_item_ds
-
+def q():
     # first call one time to cache in case we don't include the IO times
-    line_item_ds()
+    utils.get_line_item_ds()
 
-    def query() -> pd.DataFrame:
-        nonlocal line_item_ds
-        line_item_ds = line_item_ds()
+    def query():
+        lineitem = utils.get_line_item_ds()
 
-        var1 = date(1994, 1, 1)
-        var2 = date(1995, 1, 1)
-        var3 = 0.05
-        var4 = 0.07
-        var5 = 24
+        from_date = datetime(1994, 1, 1)
+        to_date = datetime(1995, 1, 1)
+        min_discount = 0.05
+        max_discount = 0.07
+        max_quantity = 24
 
-        filt = line_item_ds[
-            (line_item_ds["l_shipdate"] >= var1) & (line_item_ds["l_shipdate"] < var2)
-        ]
-        filt = filt[(filt["l_discount"] >= var3) & (filt["l_discount"] <= var4)]
-        filt = filt[filt["l_quantity"] < var5]
-        result_value = (filt["l_extendedprice"] * filt["l_discount"]).sum()
-        result_df = pd.DataFrame({"revenue": [result_value]})
-
-        return result_df
+        result = (
+            lineitem[
+                (lineitem["l_shipdate"] < to_date)
+                & (lineitem["l_shipdate"] >= from_date)
+                & (lineitem["l_discount"] <= max_discount)
+                & (lineitem["l_discount"] >= min_discount)
+                & (lineitem["l_quantity"] < max_quantity)
+            ]
+            .pipe(lambda df: df["l_extendedprice"] * df["l_discount"])
+            .sum()
+        )
+        return pd.DataFrame({"revenue": [result]})
 
     utils.run_query(Q_NUM, query)
 

@@ -20,7 +20,7 @@ settings = Settings()
 
 pd.options.mode.copy_on_write = True
 
-os.environ["MODIN_MEMORY"] = str(settings.run.modin_memory)
+# os.environ["MODIN_MEMORY"] = str(settings.run.modin_memory)
 
 
 def _read_ds(table_name: str) -> pd.DataFrame:
