@@ -11,7 +11,7 @@ def q():
     def query():
         lineitem = utils.get_line_item_ds()
 
-        result = (
+        q_final = (
             lineitem[lineitem["l_shipdate"] <= datetime(1998, 9, 2)]
             .assign(
                 disc_price=lambda df: df["l_extendedprice"] * (1 - df["l_discount"])
@@ -31,7 +31,7 @@ def q():
             .sort_values(["l_returnflag", "l_linestatus"])
         )
 
-        return result
+        return q_final
 
     utils.run_query(Q_NUM, query)
 

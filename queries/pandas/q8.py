@@ -23,33 +23,32 @@ def q():
         nation = utils.get_nation_ds()
         region = utils.get_region_ds()
 
-        from_date = datetime(1995, 1, 1)
-        to_date = datetime(1996, 12, 31)
-        q_nation = "BRAZIL"
-        q_region = "AMERICA"
-        q_part = "ECONOMY ANODIZED STEEL"
-
-        # filters
-        region = region[region["r_name"] == q_region]
-        orders = orders[
-            (orders["o_orderdate"] <= to_date) & (orders["o_orderdate"] >= from_date)
-        ]
-        part = part[part["p_type"] == q_part]
+        var1 = "BRAZIL"
+        var2 = "AMERICA"
+        var3 = "ECONOMY ANODIZED STEEL"
+        var4 = datetime(1995, 1, 1)
+        var5 = datetime(1996, 12, 31)
 
         n1 = nation[["n_nationkey", "n_regionkey"]]
+        n2 = nation[["n_nationkey", "n_name"]]
 
         result = (
-            lineitem.merge(part, left_on="l_partkey", right_on="p_partkey")
+            part.merge(lineitem, left_on="p_partkey", right_on="l_partkey")
             .merge(supplier, left_on="l_suppkey", right_on="s_suppkey")
             .merge(orders, left_on="l_orderkey", right_on="o_orderkey")
             .merge(customer, left_on="o_custkey", right_on="c_custkey")
             .merge(n1, left_on="c_nationkey", right_on="n_nationkey")
             .merge(region, left_on="n_regionkey", right_on="r_regionkey")
-            .merge(nation, left_on="s_nationkey", right_on="n_nationkey")
+            .pipe(lambda df: df[df["r_name"] == var2])
+            .merge(n2, left_on="s_nationkey", right_on="n_nationkey")
+            .pipe(
+                lambda df: df[(df["o_orderdate"] <= var5) & (df["o_orderdate"] >= var4)]
+            )
+            .pipe(lambda df: df[df["p_type"] == var3])
             .assign(
                 volume=lambda df: df["l_extendedprice"] * (1 - df["l_discount"]),
                 o_year=lambda df: df["o_orderdate"].dt.year,
-                case_volume=lambda df: df["volume"].where(df["n_name"] == q_nation),
+                case_volume=lambda df: df["volume"].where(df["n_name"] == var1),
             )
             .groupby("o_year", as_index=False)
             .agg({"case_volume": "sum", "volume": "sum"})

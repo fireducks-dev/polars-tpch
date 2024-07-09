@@ -13,19 +13,19 @@ def q():
         partsupp = utils.get_part_supp_ds()
         part = utils.get_part_ds()
 
-        part = part[
-            (part["p_brand"] != "Brand#45")
-            & (~(part["p_type"].str.startswith("MEDIUM POLISHED")))
-            & part["p_size"].isin([49, 14, 23, 45, 19, 3, 36, 9])
-        ]
+        var1 = "Brand#45"
 
         supplier = supplier[
-            ~(supplier["s_comment"].str.contains(".*Customer.*Complaints.*"))
-        ]
+            supplier["s_comment"].str.contains(".*Customer.*Complaints.*")
+        ][["s_suppkey"]]
 
-        result = (
-            partsupp.merge(supplier, left_on="ps_suppkey", right_on="s_suppkey")
-            .merge(part, left_on="ps_partkey", right_on="p_partkey")
+        q_final = (
+            part.merge(partsupp, left_on="p_partkey", right_on="ps_partkey")
+            .pipe(lambda df: df[df["p_brand"] != var1])
+            .pipe(lambda df: df[~(df["p_type"].str.startswith("MEDIUM POLISHED"))])
+            .pipe(lambda df: df[df["p_size"].isin([49, 14, 23, 45, 19, 3, 36, 9])])
+            .merge(supplier, left_on="ps_suppkey", right_on="s_suppkey", how="left")
+            .pipe(lambda df: df[df["s_suppkey"].isnull()])
             .groupby(["p_brand", "p_type", "p_size"], as_index=False)
             .agg(supplier_cnt=("ps_suppkey", "nunique"))
             .sort_values(
@@ -34,7 +34,7 @@ def q():
             )
         )
 
-        return result
+        return q_final
 
     utils.run_query(Q_NUM, query)
 

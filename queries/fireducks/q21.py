@@ -15,35 +15,35 @@ def q():
         nation = utils.get_nation_ds()
         supplier = utils.get_supplier_ds()
 
-        flineitem = lineitem[lineitem["l_receiptdate"] > lineitem["l_commitdate"]]
+        var1 = "SAUDI ARABIA"
 
-        lineitem1 = (
+        q1 = (
             lineitem.groupby("l_orderkey", as_index=False)
-            .agg(suppkey_count=("l_suppkey", "nunique"))
-            .pipe(lambda df: df[df["suppkey_count"] > 1])
+            .agg(n_supp_by_order=("l_suppkey", "nunique"))
+            .pipe(lambda df: df[df["n_supp_by_order"] > 1])
+            .merge(
+                lineitem[(lineitem["l_receiptdate"] > lineitem["l_commitdate"])],
+                on="l_orderkey",
+            )
         )
 
-        lineitem2 = (
-            flineitem.groupby("l_orderkey", as_index=False)
-            .agg(suppkey_count=("l_suppkey", "nunique"))
-            .pipe(lambda df: df[df["suppkey_count"] == 1])
-        )
-
-        nation = nation[nation["n_name"] == "SAUDI ARABIA"]
-        orders = orders[orders["o_orderstatus"] == "F"]
-
-        result = (
-            supplier.merge(nation, left_on="s_nationkey", right_on="n_nationkey")
-            .merge(flineitem, left_on="s_suppkey", right_on="l_suppkey")
+        q_final = (
+            q1.groupby("l_orderkey", as_index=False)
+            .agg(n_supp_by_order_left=("l_suppkey", "nunique"))
+            .merge(q1, on="l_orderkey")
+            .merge(supplier, left_on="l_suppkey", right_on="s_suppkey")
+            .merge(nation, left_on="s_nationkey", right_on="n_nationkey")
             .merge(orders, left_on="l_orderkey", right_on="o_orderkey")
-            .merge(lineitem1, on="l_orderkey")
-            .merge(lineitem2, on="l_orderkey")
+            .pipe(lambda df: df[df["n_supp_by_order_left"] == 1])
+            .pipe(lambda df: df[df["n_name"] == var1])
+            .pipe(lambda df: df[df["o_orderstatus"] == "F"])
             .groupby("s_name", as_index=False)
             .agg(numwait=("l_suppkey", "count"))
             .sort_values(["numwait", "s_name"], ascending=[False, True])
             .head(n=100)
         )
-        return result
+
+        return q_final
 
     utils.run_query(Q_NUM, query)
 

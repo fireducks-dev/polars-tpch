@@ -11,12 +11,10 @@ def q():
         lineitem = utils.get_line_item_ds()
         part = utils.get_part_ds()
 
-        result = (
-            lineitem[
-                lineitem["l_shipmode"].isin(["AIR", "AIR REG"])
-                & (lineitem["l_shipinstruct"] == "DELIVER IN PERSON")
-            ]
-            .merge(part, left_on="l_partkey", right_on="p_partkey")
+        q_final = (
+            part.merge(lineitem, left_on="p_partkey", right_on="l_partkey")
+            .pipe(lambda df: df[df["l_shipmode"].isin(["AIR", "AIR REG"])])
+            .pipe(lambda df: df[df["l_shipinstruct"] == "DELIVER IN PERSON"])
             .pipe(
                 lambda df: df[
                     (
@@ -56,7 +54,7 @@ def q():
             .to_frame(name="revenue")
         )
 
-        return result
+        return q_final
 
     utils.run_query(Q_NUM, query)
 

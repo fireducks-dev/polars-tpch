@@ -19,22 +19,17 @@ def q():
         orders = utils.get_orders_ds()
         nation = utils.get_nation_ds()
 
-        q_color = "green"
-        part = part[part["p_name"].str.contains(q_color, regex=False)]
-
-        result = (
-            lineitem.merge(part, left_on="l_partkey", right_on="p_partkey")
+        q_final = (
+            part.merge(partsupp, left_on="p_partkey", right_on="ps_partkey")
+            .merge(supplier, left_on="ps_suppkey", right_on="s_suppkey")
             .merge(
-                supplier.merge(nation, left_on="s_nationkey", right_on="n_nationkey"),
-                left_on="l_suppkey",
-                right_on="s_suppkey",
-            )
-            .merge(
-                partsupp,
-                left_on=["l_suppkey", "l_partkey"],
-                right_on=["ps_suppkey", "ps_partkey"],
+                lineitem,
+                left_on=["p_partkey", "ps_suppkey"],
+                right_on=["l_partkey", "l_suppkey"],
             )
             .merge(orders, left_on="l_orderkey", right_on="o_orderkey")
+            .merge(nation, left_on="s_nationkey", right_on="n_nationkey")
+            .pipe(lambda df: df[df["p_name"].str.contains("green", regex=False)])
             .assign(
                 o_year=lambda df: df["o_orderdate"].dt.year,
                 amount=lambda df: df["l_extendedprice"] * (1 - df["l_discount"])
@@ -46,7 +41,7 @@ def q():
             .sort_values(by=["nation", "o_year"], ascending=[True, False])
             .reset_index(drop=True)
         )
-        return result
+        return q_final
 
     utils.run_query(Q_NUM, query)
 

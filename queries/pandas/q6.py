@@ -14,19 +14,19 @@ def q():
     def query():
         lineitem = utils.get_line_item_ds()
 
-        from_date = datetime(1994, 1, 1)
-        to_date = datetime(1995, 1, 1)
-        min_discount = 0.05
-        max_discount = 0.07
-        max_quantity = 24
+        var1 = datetime(1994, 1, 1)
+        var2 = datetime(1995, 1, 1)
+        var3 = 0.05
+        var4 = 0.07
+        var5 = 24
 
         result = (
             lineitem[
-                (lineitem["l_shipdate"] < to_date)
-                & (lineitem["l_shipdate"] >= from_date)
-                & (lineitem["l_discount"] <= max_discount)
-                & (lineitem["l_discount"] >= min_discount)
-                & (lineitem["l_quantity"] < max_quantity)
+                (lineitem["l_shipdate"] < var2)
+                & (lineitem["l_shipdate"] >= var1)
+                & (lineitem["l_discount"] <= var4)
+                & (lineitem["l_discount"] >= var3)
+                & (lineitem["l_quantity"] < var5)
             ]
             .pipe(lambda df: df["l_extendedprice"] * df["l_discount"])
             .sum()

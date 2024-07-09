@@ -13,11 +13,11 @@ def q():
         supplier = utils.get_supplier_ds()
         lineitem = utils.get_line_item_ds()
 
+        var1 = datetime(1996, 1, 1)
+        var2 = datetime(1996, 4, 1)
+
         revenue = (
-            lineitem[
-                (lineitem["l_shipdate"] >= datetime(1996, 1, 1))
-                & (lineitem["l_shipdate"] < datetime(1996, 4, 1))
-            ]
+            lineitem[(lineitem["l_shipdate"] >= var1) & (lineitem["l_shipdate"] < var2)]
             .assign(
                 total_revenue=lambda df: df["l_extendedprice"] * (1 - df["l_discount"])
             )
@@ -25,19 +25,20 @@ def q():
             .agg({"total_revenue": "sum"})
         )
 
-        revenue = revenue[
-            revenue["total_revenue"] == revenue["total_revenue"].max()
-        ].round(2)
-
-        result = supplier.merge(
-            revenue,
-            left_on="s_suppkey",
-            right_on="l_suppkey",
-        )[["s_suppkey", "s_name", "s_address", "s_phone", "total_revenue"]].sort_values(
-            "s_suppkey", ignore_index=True
+        q_final = (
+            supplier.merge(
+                revenue,
+                left_on="s_suppkey",
+                right_on="l_suppkey",
+            )
+            .pipe(lambda df: df[df["total_revenue"] == df["total_revenue"].max()])
+            .assign(total_revenue=lambda df: df["total_revenue"].round(2))[
+                ["s_suppkey", "s_name", "s_address", "s_phone", "total_revenue"]
+            ]
+            .sort_values("s_suppkey", ignore_index=True)
         )
 
-        return result
+        return q_final
 
     utils.run_query(Q_NUM, query)
 

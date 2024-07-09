@@ -1,5 +1,6 @@
-from queries.fireducks import utils
 from datetime import datetime
+
+from queries.fireducks import utils
 
 Q_NUM = 10
 
@@ -16,20 +17,17 @@ def q():
         lineitem = utils.get_line_item_ds()
         nation = utils.get_nation_ds()
 
-        from_date = datetime(1993, 10, 1)
-        to_date = datetime(1994, 1, 1)
-        q_flag = "R"
-        limit = 20
-
-        lineitem = lineitem[lineitem["l_returnflag"] == q_flag]
-        orders = orders[
-            (orders["o_orderdate"] < to_date) & (orders["o_orderdate"] >= from_date)
-        ]
+        var1 = datetime(1993, 10, 1)
+        var2 = datetime(1994, 1, 1)
 
         result = (
-            orders.merge(customer, left_on="o_custkey", right_on="c_custkey")
-            .merge(nation, left_on="c_nationkey", right_on="n_nationkey")
+            customer.merge(orders, left_on="c_custkey", right_on="o_custkey")
             .merge(lineitem, left_on="o_orderkey", right_on="l_orderkey")
+            .merge(nation, left_on="c_nationkey", right_on="n_nationkey")
+            .pipe(
+                lambda df: df[(df["o_orderdate"] < var2) & (df["o_orderdate"] >= var1)]
+            )
+            .pipe(lambda df: df[df["l_returnflag"] == "R"])
             .assign(volume=lambda df: df["l_extendedprice"] * (1 - df["l_discount"]))
             .groupby(
                 [
@@ -58,7 +56,7 @@ def q():
             ]
             .sort_values(by="revenue", ascending=False)
             .reset_index(drop=True)
-            .head(limit)
+            .head(20)
         )
 
         return result
