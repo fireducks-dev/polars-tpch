@@ -5,9 +5,6 @@ Q_NUM = 4
 
 
 def q():
-    date1 = datetime(1993, 10, 1)
-    date2 = datetime(1993, 7, 1)
-
     # first call one time to cache in case we don't include the IO times
     utils.get_line_item_ds()
     utils.get_orders_ds()
@@ -15,21 +12,24 @@ def q():
     def query():
         lineitem = utils.get_line_item_ds()
         orders = utils.get_orders_ds()
+        orders = orders.drop(columns=["o_comment"])
 
-        lineitem = lineitem[lineitem["l_commitdate"] < lineitem["l_receiptdate"]]
-        orders = orders[
-            (orders["o_orderdate"] < date1) & (orders["o_orderdate"] >= date2)
-        ]
+        var1 = datetime(1993, 7, 1)
+        var2 = datetime(1993, 10, 1)
 
-        result_df = (
+        q_final = (
             orders.merge(lineitem, left_on="o_orderkey", right_on="l_orderkey")
+            .pipe(
+                lambda df: df[(df["o_orderdate"] < var2) & (df["o_orderdate"] >= var1)]
+            )
+            .pipe(lambda df: df[df["l_commitdate"] < df["l_receiptdate"]])
             .drop_duplicates(["o_orderpriority", "o_orderkey"])
             .groupby("o_orderpriority", as_index=False)["o_orderkey"]
             .count()
             .sort_values(["o_orderpriority"])
             .rename(columns={"o_orderkey": "order_count"})
         )
-        return result_df
+        return q_final
 
     utils.run_query(Q_NUM, query)
 

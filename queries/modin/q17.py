@@ -11,23 +11,26 @@ def q():
         lineitem = utils.get_line_item_ds()
         part = utils.get_part_ds()
 
-        part = part[
-            (part["p_brand"] == "Brand#23") & (part["p_container"] == "MED BOX")
-        ]
+        var1 = "Brand#23"
+        var2 = "MED BOX"
 
-        tmp = lineitem.merge(part, left_on="l_partkey", right_on="p_partkey")
+        q1 = (
+            part[part["p_brand"] == var1]
+            .pipe(lambda df: df[df["p_container"] == var2])
+            .merge(lineitem, left_on="p_partkey", right_on="l_partkey")
+        )
 
-        result = (
-            tmp.groupby("p_partkey", as_index=False)
+        q_final = (
+            q1.groupby("p_partkey", as_index=False)
             .agg(avg_quantity=("l_quantity", "mean"))
             .assign(avg_quantity=lambda df: df["avg_quantity"] * 0.2)
-            .merge(tmp, left_on="p_partkey", right_on="p_partkey")
+            .merge(q1, left_on="p_partkey", right_on="p_partkey")
             .pipe(lambda df: df[df["l_quantity"] < df["avg_quantity"]])
             .pipe(lambda df: df[["l_extendedprice"]].sum() / 7.0)
             .to_frame(name="avg_yearly")
         )
 
-        return result
+        return q_final
 
     utils.run_query(Q_NUM, query)
 

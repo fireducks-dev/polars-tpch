@@ -11,12 +11,14 @@ def q():
         customer = utils.get_customer_ds()
         orders = utils.get_orders_ds()
 
-        q_words = ["special", "requests"]
-        pattern = r".*".join(q_words)
+        var1 = "special"
+        var2 = "requests"
 
-        orders = orders[~orders["o_comment"].str.contains(pattern, regex=True)]
+        orders = orders[
+            ~orders["o_comment"].str.contains(f"{var1}.*{var2}", regex=True)
+        ]
 
-        result = (
+        q_final = (
             customer.merge(
                 orders, how="left", left_on="c_custkey", right_on="o_custkey"
             )
@@ -28,7 +30,7 @@ def q():
             .reset_index(drop=True)
         )
 
-        return result
+        return q_final
 
     utils.run_query(Q_NUM, query)
 
