@@ -1,3 +1,6 @@
+export FIREDUCKS_FLAGS="--fireducks-version"
+
+export RUN_IO_TYPE="skip"
 export RUN_LOG_TIMINGS=1
 export SCALE_FACTOR=1.0
 

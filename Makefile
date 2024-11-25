@@ -36,7 +36,8 @@ tables: .venv  ## Generate data tables
 	cd tpch-dbgen && ./dbgen -vf -s $(SCALE_FACTOR) && cd ..
 	mkdir -p "data/tables/scale-$(SCALE_FACTOR)"
 	mv tpch-dbgen/*.tbl data/tables/scale-$(SCALE_FACTOR)/
-	$(VENV_BIN)/python -m scripts.prepare_data
+	#$(VENV_BIN)/python -m scripts.prepare_data
+	$(VENV_BIN)/python -m scripts.prepare_data_pyarrow
 	rm -rf data/tables/scale-$(SCALE_FACTOR)/*.tbl
 
 .PHONY: run-polars
@@ -51,6 +52,10 @@ run-duckdb: .venv  ## Run DuckDB benchmarks
 run-pandas: .venv  ## Run pandas benchmarks
 	$(VENV_BIN)/python -m queries.pandas
 
+.PHONY: run-fireducks
+run-fireducks: .venv  ## Run FireDucks benchmarks
+	$(VENV_BIN)/python -m queries.fireducks
+
 .PHONY: run-pyspark
 run-pyspark: .venv  ## Run PySpark benchmarks
 	$(VENV_BIN)/python -m queries.pyspark
@@ -64,7 +69,7 @@ run-modin: .venv  ## Run Modin benchmarks
 	$(VENV_BIN)/python -m queries.modin
 
 .PHONY: run-all
-run-all: run-polars run-duckdb run-pandas run-pyspark run-dask run-modin  ## Run all benchmarks
+run-all: run-polars run-duckdb run-fireducks run-pandas run-pyspark run-dask run-modin  ## Run all benchmarks
 
 .PHONY: plot
 plot: .venv  ## Plot results

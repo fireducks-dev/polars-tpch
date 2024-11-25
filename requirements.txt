@@ -158,7 +158,7 @@ platformdirs==4.2.0
     # via virtualenv
 plotly==5.21.0
 plotnine==0.13.4
-polars==0.20.21
+polars==1.14.0
 prometheus-client==0.20.0
     # via ray
 protobuf==5.26.1
