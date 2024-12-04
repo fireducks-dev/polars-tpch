@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from queries.fireducks import utils
 
 Q_NUM = 4
@@ -13,8 +13,8 @@ def q():
         lineitem = utils.get_line_item_ds()
         orders = utils.get_orders_ds()
 
-        var1 = datetime(1993, 7, 1)
-        var2 = datetime(1993, 10, 1)
+        var1 = date(1993, 7, 1)
+        var2 = date(1993, 10, 1)
 
         q_final = (
             orders.merge(lineitem, left_on="o_orderkey", right_on="l_orderkey")

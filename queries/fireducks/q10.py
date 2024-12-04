@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 
 from queries.fireducks import utils
 
@@ -17,8 +17,8 @@ def q():
         lineitem = utils.get_line_item_ds()
         nation = utils.get_nation_ds()
 
-        var1 = datetime(1993, 10, 1)
-        var2 = datetime(1994, 1, 1)
+        var1 = date(1993, 10, 1)
+        var2 = date(1994, 1, 1)
 
         result = (
             customer.merge(orders, left_on="c_custkey", right_on="o_custkey")

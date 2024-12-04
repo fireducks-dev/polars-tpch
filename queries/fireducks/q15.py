@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 
 from queries.fireducks import utils
 
@@ -13,8 +13,8 @@ def q():
         supplier = utils.get_supplier_ds()
         lineitem = utils.get_line_item_ds()
 
-        var1 = datetime(1996, 1, 1)
-        var2 = datetime(1996, 4, 1)
+        var1 = date(1996, 1, 1)
+        var2 = date(1996, 4, 1)
 
         revenue = (
             lineitem[(lineitem["l_shipdate"] >= var1) & (lineitem["l_shipdate"] < var2)]

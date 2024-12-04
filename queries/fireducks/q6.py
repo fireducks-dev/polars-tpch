@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 
 import pandas as pd
 
@@ -14,8 +14,8 @@ def q():
     def query():
         lineitem = utils.get_line_item_ds()
 
-        var1 = datetime(1994, 1, 1)
-        var2 = datetime(1995, 1, 1)
+        var1 = date(1994, 1, 1)
+        var2 = date(1995, 1, 1)
         var3 = 0.05
         var4 = 0.07
         var5 = 24

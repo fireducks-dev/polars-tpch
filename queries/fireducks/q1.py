@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from queries.fireducks import utils
 
 Q_NUM = 1
@@ -12,7 +12,7 @@ def q():
         lineitem = utils.get_line_item_ds()
 
         q_final = (
-            lineitem[lineitem["l_shipdate"] <= datetime(1998, 9, 2)]
+            lineitem[lineitem["l_shipdate"] <= date(1998, 9, 2)]
             .assign(
                 disc_price=lambda df: df["l_extendedprice"] * (1 - df["l_discount"])
             )

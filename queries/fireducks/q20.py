@@ -1,5 +1,5 @@
 from queries.fireducks import utils
-from datetime import datetime
+from datetime import date
 
 Q_NUM = 20
 
@@ -18,8 +18,8 @@ def q():
         partsupp = utils.get_part_supp_ds()
         part = utils.get_part_ds()
 
-        var1 = datetime(1994, 1, 1)
-        var2 = datetime(1995, 1, 1)
+        var1 = date(1994, 1, 1)
+        var2 = date(1995, 1, 1)
         var3 = "CANADA"
         var4 = "forest"
 

@@ -1,34 +1,34 @@
-polars-tpch
-===========
+polars-tpch with FireDucks
+==========================
 
-This repo contains the code used for performance evaluation of polars. The benchmarks are TPC-standardised queries and data designed to test the performance of "real" workflows.
+This repo contains the code used for performance evaluation of FireDucks. The benchmarks are based on https://github.com/pola-rs/tpch, and queries for FireDucks are added.
 
-From the [TPC website](https://www.tpc.org/tpch/):
-> TPC-H is a decision support benchmark. It consists of a suite of business-oriented ad hoc queries and concurrent data modifications. The queries and the data populating the database have been chosen to have broad industry-wide relevance. This benchmark illustrates decision support systems that examine large volumes of data, execute queries with a high degree of complexity, and give answers to critical business questions.
+See the original README [here](README_original.md).
 
-## Generating TPC-H Data
+## Instructions
 
-### Project setup
-
-```shell
-# clone this repository
-git clone https://github.com/pola-rs/tpch.git
-cd tpch/tpch-dbgen
-
-# build tpch-dbgen
-make
 ```
+# install required packages
+$ sudo apt update
+$ sudo apt install python3.10-venv make gcc
 
-### Execute
+# clone benchmark
+$ git clone https://github.com/fireducks-dev/polars-tpch
+$ cd polars-tpch
 
-```shell
-# change directory to the root of the repository
-cd ../
-./run.sh
+# prepare venv for fireducks
+$ python -mvenv fireducks-venv
+$ fireducks-venv/bin/pip install fireducks linetimer pydantic pydantic_settings
+
+# prepare dataset by pyarrow
+$ make -C tpch-dbgen dbgen
+$ (cd tpch-dbgen && ./dbgen -vf -s 10)
+$ (mkdir -p data/tables_pyarrow/scale-10.0 && mv tpch-dbgen/*.tbl data/tables_pyarrow/scale-10.0/)
+$ PATH_TABLES=data/tables_pyarrow SCALE_FACTOR=10 ./fireducks-venv/bin/python -m scripts.prepare_data_pyarrow
+$ rm data/tables_pyarrow/scale-10.0/*.tbl # to save disk space
+
+# run with fireducks
+$ PATH_TABLES=data/tables_pyarrow SCALE_FACTOR=10 RUN_IO_TYPE=skip RUN_LOG_TIMINGS=True fireducks-venv/bin/python -m queries.fireducks
+
+# you will see all timings in `output/run/timings.csv`
 ```
-
-This will do the following,
-
-- Create a new virtual environment with all required dependencies.
-- Generate data for benchmarks.
-- Run the benchmark suite.

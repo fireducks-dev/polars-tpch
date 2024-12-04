@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 
 from queries.fireducks import utils
 
@@ -26,8 +26,8 @@ def q():
         var1 = "BRAZIL"
         var2 = "AMERICA"
         var3 = "ECONOMY ANODIZED STEEL"
-        var4 = datetime(1995, 1, 1)
-        var5 = datetime(1996, 12, 31)
+        var4 = date(1995, 1, 1)
+        var5 = date(1996, 12, 31)
 
         n1 = nation[["n_nationkey", "n_regionkey"]]
         n2 = nation[["n_nationkey", "n_name"]]

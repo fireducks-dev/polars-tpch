@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 
 import pandas as pd
 
@@ -15,8 +15,8 @@ def q():
         lineitem = utils.get_line_item_ds()
         part = utils.get_part_ds()
 
-        var1 = datetime(1995, 9, 1)
-        var2 = datetime(1995, 10, 1)
+        var1 = date(1995, 9, 1)
+        var2 = date(1995, 10, 1)
 
         q_final = (
             lineitem.merge(part, left_on="l_partkey", right_on="p_partkey")

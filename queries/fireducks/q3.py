@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 
 from queries.fireducks import utils
 
@@ -17,7 +17,7 @@ def q():
         lineitem = utils.get_line_item_ds()
 
         var1 = "BUILDING"
-        var2 = datetime(1995, 3, 15)
+        var2 = date(1995, 3, 15)
 
         q_final = (
             customer[customer["c_mktsegment"] == var1]

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 
 from queries.fireducks import utils
 
@@ -15,8 +15,8 @@ def q():
 
         var1 = "MAIL"
         var2 = "SHIP"
-        var3 = datetime(1994, 1, 1)
-        var4 = datetime(1995, 1, 1)
+        var3 = date(1994, 1, 1)
+        var4 = date(1995, 1, 1)
         high_priorities = ["1-URGENT", "2-HIGH"]
 
         q_final = (

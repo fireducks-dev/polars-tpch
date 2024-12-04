@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 
 import pandas as pd
 
@@ -23,8 +23,8 @@ def q():
 
         var1 = "FRANCE"
         var2 = "GERMANY"
-        var3 = datetime(1995, 1, 1)
-        var4 = datetime(1996, 12, 31)
+        var3 = date(1995, 1, 1)
+        var4 = date(1996, 12, 31)
 
         n1 = nation[nation["n_name"] == var1]
         n2 = nation[nation["n_name"] == var2]

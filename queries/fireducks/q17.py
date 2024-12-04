@@ -17,7 +17,7 @@ def q():
         q1 = (
             part[part["p_brand"] == var1]
             .pipe(lambda df: df[df["p_container"] == var2])
-            .merge(lineitem, left_on="p_partkey", right_on="l_partkey")
+            .merge(lineitem, how="left", left_on="p_partkey", right_on="l_partkey")
         )
 
         q_final = (

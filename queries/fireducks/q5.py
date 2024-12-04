@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from queries.fireducks import utils
 
 Q_NUM = 5
@@ -21,8 +21,8 @@ def q():
         region = utils.get_region_ds()
 
         var1 = "ASIA"
-        var2 = datetime(1994, 1, 1)
-        var3 = datetime(1995, 1, 1)
+        var2 = date(1994, 1, 1)
+        var3 = date(1995, 1, 1)
 
         q_final = (
             region.merge(nation, left_on="r_regionkey", right_on="n_regionkey")
