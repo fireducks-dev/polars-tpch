@@ -1,6 +1,6 @@
 import timeit
 from os.path import join
-from typing import Callable
+from typing import Callable, Any
 
 import pandas as pd
 from linetimer import CodeTimer, linetimer
@@ -16,6 +16,14 @@ from queries.common_utils import (
 from settings import Settings
 
 settings = Settings()
+
+
+import sys
+
+fd = sys.modules.get("fireducks")
+if fd is not None:
+    # to get the actual FireDucks version
+    fd.core.set_fireducks_option("fireducks-version", True)
 
 
 def _read_ds(table_name: str) -> PandasDF:
@@ -50,42 +58,61 @@ def test_results(q_num: int, result: PandasDF):
     assert_frame_equal(result.reset_index(drop=True), expected, check_dtype=False)
 
 
-@on_second_call
+def on_second_call_if_excluding_io(func: Any) -> Any:
+    def helper(*args: Any, **kwargs: Any) -> Any:
+        if not settings.run.include_io:
+            helper.calls += 1  # type: ignore[attr-defined]
+
+            # first call is outside the function
+            # this call must set the result
+            if helper.calls == 1:  # type: ignore[attr-defined]
+                helper.result = func(*args, **kwargs)  # type: ignore[attr-defined]
+                return helper.result  # type: ignore[attr-defined]
+            return helper.result  # type: ignore[attr-defined]
+        else:
+            return func(*args, **kwargs)
+
+    helper.calls = 0  # type: ignore[attr-defined]
+    helper.result = None  # type: ignore[attr-defined]
+    return helper
+
+
+@on_second_call_if_excluding_io
 def get_line_item_ds() -> pd.DataFrame:
     return _read_ds("lineitem")
 
 
-@on_second_call
+@on_second_call_if_excluding_io
 def get_orders_ds() -> pd.DataFrame:
     return _read_ds("orders")
 
 
-@on_second_call
+@on_second_call_if_excluding_io
 def get_customer_ds() -> pd.DataFrame:
     return _read_ds("customer")
 
 
-@on_second_call
+@on_second_call_if_excluding_io
 def get_region_ds() -> pd.DataFrame:
     return _read_ds("region")
 
 
-@on_second_call
+@on_second_call_if_excluding_io
 def get_nation_ds() -> pd.DataFrame:
     return _read_ds("nation")
 
 
-@on_second_call
+@on_second_call_if_excluding_io
 def get_supplier_ds() -> pd.DataFrame:
     return _read_ds("supplier")
 
 
-@on_second_call
+@on_second_call_if_excluding_io
 def get_part_ds() -> pd.DataFrame:
     return _read_ds("part")
 
 
-@on_second_call
+@on_second_call_if_excluding_io
 def get_part_supp_ds() -> pd.DataFrame:
     return _read_ds("partsupp")
 
@@ -96,7 +123,6 @@ def run_query(query_number: int, query: Callable):
             result = query()
             if hasattr(result, "_evaluate"):
                 result._evaluate()
-
 
         if settings.run.log_timings:
             log_query_timing(

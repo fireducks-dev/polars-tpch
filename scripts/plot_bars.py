@@ -31,6 +31,7 @@ COLORS = {
     "pyspark": "#C29470",
     "dask": "#77D487",
     "pandas": "#2B8C5D",
+    "fireducks": "#5F9EA0",
     "modin": "#50B05F",
 }
 
@@ -39,6 +40,7 @@ SOLUTION_NAME_MAP = {
     "polars-eager": "Polars - eager",
     "duckdb": "DuckDB",
     "pandas": "pandas",
+    "fireducks": "FireDucks",
     "dask": "Dask",
     "modin": "Modin",
     "pyspark": "PySpark",
