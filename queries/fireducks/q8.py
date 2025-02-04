@@ -1,6 +1,6 @@
 from datetime import date
 
-from queries.pandas import utils
+from queries.fireducks import utils
 
 Q_NUM = 8
 

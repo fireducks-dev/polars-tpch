@@ -1,5 +1,5 @@
 from datetime import date
-from queries.pandas import utils
+from queries.fireducks import utils
 
 Q_NUM = 4
 
@@ -12,7 +12,6 @@ def q():
     def query():
         lineitem = utils.get_line_item_ds()
         orders = utils.get_orders_ds()
-        orders = orders.drop(columns=["o_comment"])
 
         var1 = date(1993, 7, 1)
         var2 = date(1993, 10, 1)

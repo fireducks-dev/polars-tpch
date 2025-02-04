@@ -4,10 +4,15 @@ PYTHONPATH=
 SHELL=/bin/bash
 VENV=.venv
 VENV_BIN=$(VENV)/bin
+VENV_FIREDUCKS = .venv-fireducks
 
 .venv:  ## Set up Python virtual environment and install dependencies
 	python3 -m venv $(VENV)
 	$(MAKE) install-deps
+
+.venv-fireducks:  ## Set up minimum virtual environment for running with FireDucks
+	python3 -m venv $(VENV_FIREDUCKS)
+	$(VENV_FIREDUCKS)/bin/pip install fireducks linetimer pydantic pydantic_settings
 
 .PHONY: install-deps
 install-deps: .venv  ## Install Python project dependencies
@@ -38,6 +43,15 @@ data/tables/: .venv  ## Generate data tables
 	mv tpch-dbgen/*.tbl data/tables/scale-$(SCALE_FACTOR)/
 	$(VENV_BIN)/python -m scripts.prepare_data
 	rm -rf data/tables/scale-$(SCALE_FACTOR)/*.tbl
+
+.PHONY: tables-pyarrow
+tables-pyarrow: .venv  ## Generate data tables using pyarrow
+	$(MAKE) -C tpch-dbgen dbgen
+	cd tpch-dbgen && ./dbgen -vf -s $(SCALE_FACTOR) && cd ..
+	mkdir -p "$(PATH_TABLES)/scale-$(SCALE_FACTOR)"
+	mv tpch-dbgen/*.tbl $(PATH_TABLES)/scale-$(SCALE_FACTOR)/
+	$(VENV_BIN)/python -m scripts.prepare_data_pyarrow
+	rm -rf $(PATH_TABLES)/scale-$(SCALE_FACTOR)/*.tbl
 
 .PHONY: run-polars
 run-polars: .venv data/tables/  ## Run Polars benchmarks
@@ -76,6 +90,10 @@ run-dask: .venv  ## Run Dask benchmarks
 .PHONY: run-modin data/tables/
 run-modin: .venv  ## Run Modin benchmarks
 	$(VENV_BIN)/python -m queries.modin
+
+.PHONY: run-fireducks
+run-fireducks: .venv-fireducks  ## Run FireDucks benchmarks
+	PATH_TABLES=data/tables_pyarrow $(VENV_FIREDUCKS)/bin/python -m queries.fireducks
 
 .PHONY: run-all
 run-all: run-polars run-duckdb run-pandas run-pyspark run-dask run-modin  ## Run all benchmarks

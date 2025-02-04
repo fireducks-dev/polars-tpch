@@ -7,6 +7,7 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .venv/
+.venv-fireducks/
 
 # Rust
 .cargo/
@@ -33,5 +34,6 @@ qgen
 
 # Project
 /data/tables/
+/data/tables_pyarrow/
 /output/
 .env*

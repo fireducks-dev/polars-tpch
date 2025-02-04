@@ -2,7 +2,7 @@ from datetime import date
 
 import pandas as pd
 
-from queries.pandas import utils
+from queries.fireducks import utils
 
 Q_NUM = 7
 
@@ -13,7 +13,6 @@ def q():
     utils.get_nation_ds()
     utils.get_orders_ds()
     utils.get_supplier_ds()
-
 
     def query():
         customer = utils.get_customer_ds()

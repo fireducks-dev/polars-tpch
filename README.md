@@ -1,45 +1,27 @@
-# Polars Decision Support (PDS) benchmarks
+polars-tpch with FireDucks
+==========================
 
-## Disclaimer
+This repo contains the code used for performance evaluation of FireDucks. The benchmarks are based on https://github.com/pola-rs/tpch, and queries for FireDucks are added.
 
-Polars Decision Support (PDS) benchmarks are derived from the TPC-H Benchmarks and as such any results obtained using PDS are not comparable to published TPC-H Benchmark results, as the results obtained from using PDS do not comply with the TPC-H Benchmarks.
+You can find the original README [here](README_original.md).
 
-These benchmarks are our adaptation of an industry-standard decision support benchmark often used in the DataFrame library community. PDS consists of the same 22 queries as the industry standard benchmark TPC-H, but has modified parts for dataset generation and execution scripts.
+## Instructions
 
-From the [TPC website](https://www.tpc.org/tpch/):
-> TPC-H is a decision support benchmark. It consists of a suite of business-oriented ad hoc queries and concurrent data modifications. The queries and the data populating the database have been chosen to have broad industry-wide relevance. This benchmark illustrates decision support systems that examine large volumes of data, execute queries with a high degree of complexity, and give answers to critical business questions.
-
-## License
-
-PDS is licensed under Apache License, Version 2.0.
-
-Additionally, certain files in PDS are licensed subject to the accompanying [TPC EULA](TPC%20EULA.txt) (also available at <http://www.tpc.org/tpc_documents_current_versions/current_specifications5.asp>). Files subject to the TPC EULA are identified as such within the files.
-
-You may not use PDS except in compliance with the Apache License, Version 2.0 and the TPC EULA.
-
-## Generating PDS Benchmarking Data
-
-### Project setup
-
-```shell
+```
 # clone this repository
-git clone https://github.com/pola-rs/pdsh.git
-cd tpch/tpch-dbgen
+$ git clone https://github.com/fireducks-dev/polars-tpch
+$ cd polars-tpch
 
-# build tpch-dbgen
-make
+# Run
+$ SCALE_FACTOR=10.0 ./run-fireducks.sh
 ```
 
-### Execute
+You will see all timings in `output/run/timings.csv`
 
-```shell
-# change directory to the root of the repository
-cd ../
-./run.sh
+To run fireducks, polars and pandas three times:
+
 ```
-
-This will do the following,
-
-- Create a new virtual environment with all required dependencies.
-- Generate data for benchmarks.
-- Run the benchmark suite.
+$ .venv/bin/pip install -U pandas polars duckdb
+$ RUN_IO_TYPE=skip ./run-fpdp3.sh
+$ RUN_IO_TYPE=parquet ./run-fpdp3.sh
+```

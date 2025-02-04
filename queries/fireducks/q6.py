@@ -2,7 +2,7 @@ from datetime import date
 
 import pandas as pd
 
-from queries.pandas import utils
+from queries.fireducks import utils
 
 Q_NUM = 6
 
